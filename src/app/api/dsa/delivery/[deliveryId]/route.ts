@@ -3,6 +3,8 @@ import { isValidObjectId } from 'mongoose';
 import { connectDB } from '@/lib/db';
 import { Delivery } from '@/models/delivery.model';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ deliveryId: string }> }

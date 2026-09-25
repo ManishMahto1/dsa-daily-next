@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { submitAnswer } from '@/modules/progress/progress.service';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   await connectDB();
 

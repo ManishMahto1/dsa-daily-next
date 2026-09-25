@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Delivery } from '@/models/delivery.model';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   await connectDB();
 

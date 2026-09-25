@@ -3,7 +3,7 @@ import { env } from '../../lib/env';
 import { IQuestion } from '../../models/question.model';
 import { buildDailyQuestionEmail } from './templates/dailyQuestion.template';
 
-const resend = new Resend(env.RESEND_API_KEY);
+const resend = new Resend(env.RESEND_API_KEY || 're_placeholder_for_build');
 
 export async function sendDailyQuestionEmail(question: IQuestion, deliveryId: string) {
   const { subject, html, text } = buildDailyQuestionEmail({ question, deliveryId });
