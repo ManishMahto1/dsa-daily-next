@@ -1,6 +1,6 @@
 import { connectDB } from '@/lib/db';
 import { Delivery } from '@/models/delivery.model';
-import { IQuestion } from '@/models/question.model';
+import { Question, IQuestion } from '@/models/question.model';
 import { getProgressSummary } from '@/modules/progress/progress.service';
 import Link from 'next/link';
 import TriggerButton from './TriggerButton';
@@ -377,7 +377,7 @@ export default async function HomePage() {
               const q = d.questionId;
               if (!q) return null;
               const diffStyle =
-                DIFFICULTY_STYLES[q.difficulty as 'easy' | 'medium' | 'hard'] ?? DIFFICULTY_STYLES.easy;
+                DIFFICULTY_STYLES[q.difficulty as keyof typeof DIFFICULTY_STYLES] ?? DIFFICULTY_STYLES.school;
 
               return (
                 <div

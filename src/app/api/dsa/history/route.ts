@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { Delivery } from '@/models/delivery.model';
-import { IQuestion } from '@/models/question.model';
+import { Question, IQuestion } from '@/models/question.model';
 
 export const dynamic = 'force-dynamic';
 

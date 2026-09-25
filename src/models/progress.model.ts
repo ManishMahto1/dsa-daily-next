@@ -1,6 +1,8 @@
 import { Schema, model, models, Document, Types, Model } from 'mongoose';
 import { Difficulty } from './question.model';
 
+import { Question } from './question.model';
+
 // Single-user system — this collection only ever holds ONE document.
 export interface IProgress extends Document {
   _id: Types.ObjectId;
@@ -24,15 +26,13 @@ const ProgressSchema = new Schema<IProgress>(
     missStreak: { type: Number, default: 0 },
     totalSolved: { type: Number, default: 0 },
     totalAttempted: { type: Number, default: 0 },
-    solvedIds: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
+    solvedIds: [{ type: Schema.Types.ObjectId, ref: Question.modelName || 'Question' }],
   },
   { timestamps: true }
 );
 
-if (models.Progress) {
-  delete (models as unknown as Record<string, unknown>).Progress;
-}
-export const Progress: Model<IProgress> = model<IProgress>('Progress', ProgressSchema);
+export const Progress: Model<IProgress> =
+  (models.Progress as Model<IProgress>) || model<IProgress>('Progress', ProgressSchema);
 
 export async function getOrCreateProgress(): Promise<IProgress> {
   let progress = await Progress.findOne();

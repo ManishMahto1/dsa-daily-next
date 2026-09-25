@@ -31,8 +31,5 @@ const QuestionSchema = new Schema<IQuestion>(
   { timestamps: true }
 );
 
-// Reset cached model on hot reload so updated enum values take effect immediately
-if (models.Question) {
-  delete (models as unknown as Record<string, unknown>).Question;
-}
-export const Question: Model<IQuestion> = model<IQuestion>('Question', QuestionSchema);
+export const Question: Model<IQuestion> =
+  (models.Question as Model<IQuestion>) || model<IQuestion>('Question', QuestionSchema);

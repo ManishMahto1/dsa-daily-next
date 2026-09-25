@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 import { env } from './env';
 
+// Register all Mongoose models so relations and populate() work in all serverless instances
+import '@/models/question.model';
+import '@/models/delivery.model';
+import '@/models/progress.model';
+
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;

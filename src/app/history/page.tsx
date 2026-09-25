@@ -1,6 +1,6 @@
 import { connectDB } from '@/lib/db';
 import { Delivery } from '@/models/delivery.model';
-import { IQuestion } from '@/models/question.model';
+import { Question, IQuestion, Difficulty } from '@/models/question.model';
 import HistoryView, { HistoryItem } from './HistoryView';
 
 export const dynamic = 'force-dynamic';
@@ -23,7 +23,7 @@ export default async function HistoryPage() {
       questionId: q?._id ? q._id.toString() : '',
       title: q?.title ?? 'Untitled Problem',
       topic: q?.topic ?? 'General',
-      difficulty: (q?.difficulty ?? d.difficultyAtSend ?? 'easy') as 'easy' | 'medium' | 'hard',
+      difficulty: (q?.difficulty ?? d.difficultyAtSend ?? 'school') as Difficulty,
       status: d.status,
       isCorrect: d.isCorrect,
       createdAt: d.createdAt ? d.createdAt.toISOString() : new Date().toISOString(),

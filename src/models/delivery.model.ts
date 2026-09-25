@@ -1,4 +1,5 @@
 import { Schema, model, models, Document, Types, Model } from 'mongoose';
+import { Question } from './question.model';
 
 export type DeliveryStatus = 'pending' | 'sent' | 'failed' | 'answered';
 
@@ -17,7 +18,7 @@ export interface IDelivery extends Document {
 
 const DeliverySchema = new Schema<IDelivery>(
   {
-    questionId: { type: Schema.Types.ObjectId, ref: 'Question', required: true },
+    questionId: { type: Schema.Types.ObjectId, ref: Question.modelName || 'Question', required: true },
     difficultyAtSend: { type: String, required: true },
     status: {
       type: String,
@@ -33,7 +34,5 @@ const DeliverySchema = new Schema<IDelivery>(
   { timestamps: true }
 );
 
-if (models.Delivery) {
-  delete (models as unknown as Record<string, unknown>).Delivery;
-}
-export const Delivery: Model<IDelivery> = model<IDelivery>('Delivery', DeliverySchema);
+export const Delivery: Model<IDelivery> =
+  (models.Delivery as Model<IDelivery>) || model<IDelivery>('Delivery', DeliverySchema);

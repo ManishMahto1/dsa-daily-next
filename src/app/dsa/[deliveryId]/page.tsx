@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { marked } from 'marked';
 import { connectDB } from '@/lib/db';
 import { Delivery } from '@/models/delivery.model';
-import { IQuestion } from '@/models/question.model';
+import { Question, IQuestion } from '@/models/question.model';
 import SubmitAnswer from './SubmitAnswer';
 import HintsSection from './HintsSection';
 
