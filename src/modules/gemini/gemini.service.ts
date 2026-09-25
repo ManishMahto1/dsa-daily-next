@@ -21,40 +21,78 @@ export async function generateQuestion(
   difficulty: Difficulty,
   avoidTitles: string[]
 ): Promise<GeneratedQuestion> {
-  const model = genAI.getGenerativeModel({
-    model: env.GEMINI_MODEL,
-    generationConfig: { responseMimeType: 'application/json' },
-  });
+  const modelsToTry = [
+    env.GEMINI_MODEL,
+    'gemini-3.6-flash',
+    'gemini-3.8-flash',
+    'gemini-flash-latest',
+  ].filter((m, i, arr) => m && arr.indexOf(m) === i);
 
   const avoidList = avoidTitles.length
     ? `Do NOT repeat any of these already-sent titles: ${avoidTitles.slice(-50).join(', ')}.`
     : '';
 
-  const prompt = `You are generating ONE Data Structures & Algorithms practice question for a coding-interview prep tool.
+  const prompt = `You are a Principal Software Engineer crafting a top-tier Data Structures & Algorithms practice problem.
 
-Difficulty: "${difficulty}" (easy = fundamentals like arrays/strings/hashmaps solvable in <15 min; medium = classic interview problems like sliding window, graphs, DP intro; hard = advanced DP, complex graph algorithms, hard two-pointer/binary-search).
+Target Difficulty: "${difficulty}"
+- easy: fundamentals (arrays, hash maps, simple two pointers, string manipulation) solvable in <15 minutes.
+- medium: standard interview classics (sliding window, binary search variations, trees, graphs BFS/DFS, two-pointer, DP intro).
+- hard: advanced techniques (dynamic programming on trees/intervals, topological sort, monotonic stack, hard binary search).
 
 ${avoidList}
 
-Return ONLY valid JSON, no markdown fences, no commentary, matching exactly this shape:
+Instructions for output fields:
+1. "title": Clean, canonical problem name (e.g. "Contains Duplicate", "Two Sum", "Valid Anagram", "Group Anagrams").
+2. "topic": Main algorithmic topic (e.g. "Arrays & Hashing", "Two Pointers", "Sliding Window", "Binary Search", "Trees", "Dynamic Programming").
+3. "statement": Complete problem description in Markdown with:
+   - A clear explanation of the task, inputs, and outputs.
+   - ### Examples
+     Provide 2 to 3 detailed examples with Input, Output, and Explanation:
+     Example 1:
+     Input: nums = [1, 2, 3, 1]
+     Output: true
+     Explanation: 1 appears at indices 0 and 3.
+   - ### Constraints
+     Include clear mathematical constraints (e.g. 1 <= nums.length <= 10^5, -10^9 <= nums[i] <= 10^9) and optimal target time/space complexities (e.g. Time: O(n), Space: O(n)).
+4. "hints": Array of 2 to 3 progressive hints:
+   - Hint 1: What is the initial brute force thought and its drawback?
+   - Hint 2: What data structure or pattern allows achieving the optimal time/space complexity?
+   - Hint 3: Key implementation details or edge cases to consider.
+
+Return ONLY a valid JSON object matching this schema without markdown codeblock wrapper:
 {
-  "title": "short problem name",
-  "topic": "one or two words, e.g. Arrays, Graphs, Dynamic Programming",
-  "statement": "the full problem statement, 2-5 sentences, self-contained, no external links needed",
-  "hints": ["one short hint", "an optional second hint"]
+  "title": "Problem Title",
+  "topic": "Topic Name",
+  "statement": "Detailed Markdown string with problem description, Examples, and Constraints",
+  "hints": ["Hint 1 text", "Hint 2 text", "Hint 3 text"]
 }`;
 
-  const result = await model.generateContent(prompt);
-  const raw = result.response.text();
+  let lastError: unknown;
+  for (const modelName of modelsToTry) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: { responseMimeType: 'application/json' },
+      });
 
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    throw new Error(`Gemini returned non-JSON output: ${raw.slice(0, 200)}`);
+      const result = await model.generateContent(prompt);
+      const raw = result.response.text();
+
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        throw new Error(`Gemini returned non-JSON output: ${raw.slice(0, 200)}`);
+      }
+
+      return validateGeneratedQuestion(parsed);
+    } catch (err) {
+      lastError = err;
+      console.warn(`[Gemini] Model ${modelName} failed, trying next fallback...`, err);
+    }
   }
 
-  return validateGeneratedQuestion(parsed);
+  throw lastError;
 }
 
 function validateGeneratedQuestion(data: unknown): GeneratedQuestion {

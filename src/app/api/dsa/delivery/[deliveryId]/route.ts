@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isValidObjectId } from 'mongoose';
 import { connectDB } from '@/lib/db';
 import { Delivery } from '@/models/delivery.model';
 
@@ -7,6 +8,9 @@ export async function GET(
   { params }: { params: Promise<{ deliveryId: string }> }
 ) {
   const { deliveryId } = await params;
+  if (!isValidObjectId(deliveryId)) {
+    return NextResponse.json({ success: false, message: 'Invalid delivery ID' }, { status: 400 });
+  }
   await connectDB();
 
   const delivery = await Delivery.findById(deliveryId).populate('questionId');

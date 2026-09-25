@@ -16,12 +16,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
   }
 
-  await connectDB();
-  const result = await runDailyDsaJob();
+  try {
+    await connectDB();
+    const result = await runDailyDsaJob();
 
-  return NextResponse.json({
-    success: true,
-    message: 'Daily DSA job triggered manually — email queued (worker process sends it)',
-    data: result,
-  });
+    return NextResponse.json({
+      success: true,
+      message: 'Daily DSA job triggered manually — email queued (worker process sends it)',
+      data: result,
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ success: false, message }, { status: 500 });
+  }
 }
