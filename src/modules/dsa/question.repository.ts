@@ -2,13 +2,16 @@ import { Types } from 'mongoose';
 import { Question, Difficulty, IQuestion } from '../../models/question.model';
 import { generateQuestion } from '../gemini/gemini.service';
 
+function escapeRegex(text: string): string {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
 /**
  * Question sourcing strategy:
  *  1. Look for an existing, unseen question at this difficulty in Mongo
- *     (questions Gemini generated on previous days, not yet sent).
- *  2. If the pool is empty, ask Gemini for a brand-new one, save it,
- *     and return it. This means the "question bank" grows itself —
- *     no manual seeding required.
+ *     (questions that have NEVER been delivered to the user).
+ *  2. If the pool has no unseen questions, ask Gemini for a brand-new, unique one.
+ *  3. Ensure the newly generated title is strictly unique across the entire database.
  */
 export async function findOrGenerateQuestion(
   difficulty: Difficulty,
@@ -17,16 +20,25 @@ export async function findOrGenerateQuestion(
   const existing = await findUnseenExisting(difficulty, excludeIds);
   if (existing) return existing;
 
-  const recentTitles = await Question.find({ difficulty })
-    .sort({ createdAt: -1 })
-    .limit(30)
-    .select('title')
-    .lean();
+  // Pass all previously generated and delivered question titles to avoid repeating
+  const existingQuestions = await Question.find().select('title').lean();
+  const avoidTitles = existingQuestions.map((q) => q.title);
 
-  const generated = await generateQuestion(
-    difficulty,
-    recentTitles.map((q) => q.title)
-  );
+  let generated = await generateQuestion(difficulty, avoidTitles);
+
+  // Check for collision against existing database questions
+  let attempts = 0;
+  while (attempts < 3) {
+    const duplicate = await Question.findOne({
+      title: { $regex: new RegExp(`^${escapeRegex(generated.title.trim())}$`, 'i') },
+    });
+    if (!duplicate) break;
+
+    // Title already exists, add to avoid list and regenerate
+    avoidTitles.push(generated.title);
+    attempts++;
+    generated = await generateQuestion(difficulty, avoidTitles);
+  }
 
   return Question.create({
     title: generated.title,
