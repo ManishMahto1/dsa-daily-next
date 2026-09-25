@@ -14,6 +14,18 @@ const DIFFICULTY_CONFIG: Record<
   string,
   { label: string; color: string; bg: string; border: string }
 > = {
+  school: {
+    label: 'School (Beginner)',
+    color: '#06b6d4',
+    bg: 'rgba(6, 182, 212, 0.12)',
+    border: 'rgba(6, 182, 212, 0.3)',
+  },
+  college: {
+    label: 'College (Foundation)',
+    color: '#8b5cf6',
+    bg: 'rgba(139, 92, 246, 0.12)',
+    border: 'rgba(139, 92, 246, 0.3)',
+  },
   easy: {
     label: 'Easy',
     color: '#10b981',

@@ -1,9 +1,9 @@
 import { Difficulty } from '../../models/question.model';
 
-const LEVEL_ORDER: Difficulty[] = ['easy', 'medium', 'hard'];
+export const LEVEL_ORDER: Difficulty[] = ['school', 'college', 'easy', 'medium', 'hard'];
 
-const PROMOTE_AFTER_STREAK = 3; // 3 correct in a row -> level up
-const DEMOTE_AFTER_MISSES = 2; // 2 wrong/unanswered in a row -> level down
+export const PROMOTE_AFTER_STREAK = 3; // 3 correct in a row -> level up
+export const DEMOTE_AFTER_MISSES = 3; // 3 misses -> level down
 
 interface ProgressLike {
   currentLevel: Difficulty;

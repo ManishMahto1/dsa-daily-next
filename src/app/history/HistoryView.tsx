@@ -8,7 +8,7 @@ export interface HistoryItem {
   questionId: string;
   title: string;
   topic: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'school' | 'college' | 'easy' | 'medium' | 'hard';
   status: 'pending' | 'sent' | 'failed' | 'answered';
   isCorrect?: boolean;
   createdAt: string;
@@ -16,6 +16,8 @@ export interface HistoryItem {
 }
 
 const DIFFICULTY_STYLES = {
+  school: { color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)', border: 'rgba(6, 182, 212, 0.3)' },
+  college: { color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.12)', border: 'rgba(139, 92, 246, 0.3)' },
   easy: { color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', border: 'rgba(16, 185, 129, 0.3)' },
   medium: { color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', border: 'rgba(245, 158, 11, 0.3)' },
   hard: { color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', border: 'rgba(239, 68, 68, 0.3)' },
@@ -202,7 +204,7 @@ export default function HistoryView({ initialItems }: { initialItems: HistoryIte
           <span style={{ fontSize: 12, color: '#64748b', fontWeight: 600, marginLeft: 12, marginRight: 4 }}>
             Difficulty:
           </span>
-          {['all', 'easy', 'medium', 'hard'].map((diff) => (
+          {['all', 'school', 'college', 'easy', 'medium', 'hard'].map((diff) => (
             <button
               key={diff}
               onClick={() => setSelectedDifficulty(diff)}

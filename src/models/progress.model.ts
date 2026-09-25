@@ -15,7 +15,11 @@ export interface IProgress extends Document {
 
 const ProgressSchema = new Schema<IProgress>(
   {
-    currentLevel: { type: String, enum: ['easy', 'medium', 'hard'], default: 'easy' },
+    currentLevel: {
+      type: String,
+      enum: ['school', 'college', 'easy', 'medium', 'hard'],
+      default: 'school',
+    },
     streak: { type: Number, default: 0 },
     missStreak: { type: Number, default: 0 },
     totalSolved: { type: Number, default: 0 },

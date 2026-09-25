@@ -8,6 +8,8 @@ import TriggerButton from './TriggerButton';
 export const dynamic = 'force-dynamic';
 
 const DIFFICULTY_STYLES = {
+  school: { color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)', border: 'rgba(6, 182, 212, 0.3)' },
+  college: { color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.12)', border: 'rgba(139, 92, 246, 0.3)' },
   easy: { color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', border: 'rgba(16, 185, 129, 0.3)' },
   medium: { color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', border: 'rgba(245, 158, 11, 0.3)' },
   hard: { color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', border: 'rgba(239, 68, 68, 0.3)' },
@@ -112,7 +114,11 @@ export default async function HomePage() {
                 fontWeight: 700,
                 textTransform: 'capitalize',
                 color:
-                  progress.currentLevel === 'easy'
+                  progress.currentLevel === 'school'
+                    ? '#06b6d4'
+                    : progress.currentLevel === 'college'
+                    ? '#8b5cf6'
+                    : progress.currentLevel === 'easy'
                     ? '#10b981'
                     : progress.currentLevel === 'medium'
                     ? '#f59e0b'
@@ -158,6 +164,57 @@ export default async function HomePage() {
               {progress.accuracy}%
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* Learning Progression Roadmap */}
+      <div className="glass-panel" style={{ padding: '20px 24px', marginBottom: 28 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#94a3b8' }}>
+            Curriculum Path: <span style={{ color: '#f8fafc' }}>From Scratch to Mastery</span>
+          </div>
+          <div style={{ fontSize: 12, color: '#818cf8', fontWeight: 600 }}>
+            Solve 3 in a row to level up ➔
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+          {[
+            { key: 'school', label: '1. School Level', desc: 'Loops, Math, Logic', color: '#06b6d4' },
+            { key: 'college', label: '2. College Level', desc: 'Arrays, Search, Sort', color: '#8b5cf6' },
+            { key: 'easy', label: '3. LeetCode Easy', desc: 'HashMaps, Pointers', color: '#10b981' },
+            { key: 'medium', label: '4. LeetCode Med', desc: 'Trees, Graphs, DP', color: '#f59e0b' },
+            { key: 'hard', label: '5. LeetCode Hard', desc: 'Advanced Graphs/DP', color: '#ef4444' },
+          ].map((lvl) => {
+            const isCurrent = progress.currentLevel === lvl.key;
+            return (
+              <div
+                key={lvl.key}
+                style={{
+                  flex: '1 1 140px',
+                  minWidth: 135,
+                  padding: '10px 12px',
+                  borderRadius: 10,
+                  background: isCurrent ? `${lvl.color}22` : 'rgba(255, 255, 255, 0.02)',
+                  border: `1px solid ${isCurrent ? lvl.color : 'rgba(255, 255, 255, 0.06)'}`,
+                  boxShadow: isCurrent ? `0 0 16px ${lvl.color}33` : 'none',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: isCurrent ? lvl.color : '#94a3b8' }}>
+                    {lvl.label}
+                  </span>
+                  {isCurrent && (
+                    <span style={{ fontSize: 9, background: lvl.color, color: '#000', padding: '1px 5px', borderRadius: 4, fontWeight: 800 }}>
+                      ACTIVE
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: 11, color: '#64748b' }}>{lvl.desc}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

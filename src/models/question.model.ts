@@ -1,6 +1,6 @@
 import { Schema, model, models, Document, Types, Model } from 'mongoose';
 
-export type Difficulty = 'easy' | 'medium' | 'hard';
+export type Difficulty = 'school' | 'college' | 'easy' | 'medium' | 'hard';
 
 export interface IQuestion extends Document {
   _id: Types.ObjectId;
@@ -17,7 +17,12 @@ export interface IQuestion extends Document {
 const QuestionSchema = new Schema<IQuestion>(
   {
     title: { type: String, required: true, trim: true },
-    difficulty: { type: String, enum: ['easy', 'medium', 'hard'], required: true, index: true },
+    difficulty: {
+      type: String,
+      enum: ['school', 'college', 'easy', 'medium', 'hard'],
+      required: true,
+      index: true,
+    },
     topic: { type: String, required: true, trim: true, index: true },
     statement: { type: String, required: true },
     hints: { type: [String], default: [] },

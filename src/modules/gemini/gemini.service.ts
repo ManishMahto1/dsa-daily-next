@@ -35,9 +35,11 @@ export async function generateQuestion(
   const prompt = `You are a Principal Software Engineer crafting a top-tier Data Structures & Algorithms practice problem.
 
 Target Difficulty: "${difficulty}"
-- easy: fundamentals (arrays, hash maps, simple two pointers, string manipulation) solvable in <15 minutes.
-- medium: standard interview classics (sliding window, binary search variations, trees, graphs BFS/DFS, two-pointer, DP intro).
-- hard: advanced techniques (dynamic programming on trees/intervals, topological sort, monotonic stack, hard binary search).
+- "school": Absolute basic programming fundamentals for school/beginners. Concepts: basic loops (for/while), conditionals (if/else), basic arithmetic, single array traversal, basic string counting. Examples: Find Maximum in an Array, Sum of Digits of a Number, Reverse a Number, Check Palindrome Number, Count Even and Odd Numbers in Array, Factorial of a Number, Check Prime Number, Count Vowels in a String, Sum of Array Elements.
+- "college": Foundational Computer Science curriculum & intro Data Structures. Concepts: Linear Search, Binary Search on sorted arrays, Bubble/Selection Sort, In-Place Array Reversal, Find Missing Number from 1 to N, Second Largest Element in Array, Remove Duplicates from Sorted Array, Check Anagram using Frequency Counting, Basic Linked List Traversal.
+- "easy": Standard LeetCode Easy interview fundamentals (e.g. Two Sum, Contains Duplicate, Valid Parentheses, Best Time to Buy and Sell Stock).
+- "medium": Standard interview staples (Sliding Window, Binary Search variations, Trees, Graphs BFS/DFS, Two-Pointer, Dynamic Programming intro).
+- "hard": Advanced techniques (Complex DP on trees/grids, Topological Sort, Monotonic Stack, Hard Graph Algorithms).
 
 ${avoidList}
 
