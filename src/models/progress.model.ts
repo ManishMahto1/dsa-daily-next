@@ -29,8 +29,10 @@ const ProgressSchema = new Schema<IProgress>(
   { timestamps: true }
 );
 
-export const Progress: Model<IProgress> =
-  models.Progress || model<IProgress>('Progress', ProgressSchema);
+if (models.Progress) {
+  delete (models as unknown as Record<string, unknown>).Progress;
+}
+export const Progress: Model<IProgress> = model<IProgress>('Progress', ProgressSchema);
 
 export async function getOrCreateProgress(): Promise<IProgress> {
   let progress = await Progress.findOne();

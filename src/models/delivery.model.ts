@@ -33,5 +33,7 @@ const DeliverySchema = new Schema<IDelivery>(
   { timestamps: true }
 );
 
-export const Delivery: Model<IDelivery> =
-  models.Delivery || model<IDelivery>('Delivery', DeliverySchema);
+if (models.Delivery) {
+  delete (models as unknown as Record<string, unknown>).Delivery;
+}
+export const Delivery: Model<IDelivery> = model<IDelivery>('Delivery', DeliverySchema);

@@ -31,6 +31,8 @@ const QuestionSchema = new Schema<IQuestion>(
   { timestamps: true }
 );
 
-// `models.Question` guard avoids "OverwriteModelError" from Next.js hot reload.
-export const Question: Model<IQuestion> =
-  models.Question || model<IQuestion>('Question', QuestionSchema);
+// Reset cached model on hot reload so updated enum values take effect immediately
+if (models.Question) {
+  delete (models as unknown as Record<string, unknown>).Question;
+}
+export const Question: Model<IQuestion> = model<IQuestion>('Question', QuestionSchema);

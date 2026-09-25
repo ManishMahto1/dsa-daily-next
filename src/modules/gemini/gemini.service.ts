@@ -69,28 +69,35 @@ Return ONLY a valid JSON object matching this schema without markdown codeblock 
   "hints": ["Hint 1 text", "Hint 2 text", "Hint 3 text"]
 }`;
 
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
   let lastError: unknown;
   for (const modelName of modelsToTry) {
-    try {
-      const model = genAI.getGenerativeModel({
-        model: modelName,
-        generationConfig: { responseMimeType: 'application/json' },
-      });
-
-      const result = await model.generateContent(prompt);
-      const raw = result.response.text();
-
-      let parsed: unknown;
+    for (let attempt = 1; attempt <= 2; attempt++) {
       try {
-        parsed = JSON.parse(raw);
-      } catch {
-        throw new Error(`Gemini returned non-JSON output: ${raw.slice(0, 200)}`);
-      }
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          generationConfig: { responseMimeType: 'application/json' },
+        });
 
-      return validateGeneratedQuestion(parsed);
-    } catch (err) {
-      lastError = err;
-      console.warn(`[Gemini] Model ${modelName} failed, trying next fallback...`, err);
+        const result = await model.generateContent(prompt);
+        const raw = result.response.text();
+
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(raw);
+        } catch {
+          throw new Error(`Gemini returned non-JSON output: ${raw.slice(0, 200)}`);
+        }
+
+        return validateGeneratedQuestion(parsed);
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[Gemini] Model ${modelName} attempt ${attempt} failed: ${err.message}`);
+        if (attempt < 2) {
+          await sleep(1500);
+        }
+      }
     }
   }
 
