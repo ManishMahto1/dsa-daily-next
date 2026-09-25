@@ -1,0 +1,31 @@
+import { Schema, model, models, Document, Types, Model } from 'mongoose';
+
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
+export interface IQuestion extends Document {
+  _id: Types.ObjectId;
+  title: string;
+  difficulty: Difficulty;
+  topic: string;
+  statement: string;
+  hints: string[];
+  source: 'gemini' | 'manual';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const QuestionSchema = new Schema<IQuestion>(
+  {
+    title: { type: String, required: true, trim: true },
+    difficulty: { type: String, enum: ['easy', 'medium', 'hard'], required: true, index: true },
+    topic: { type: String, required: true, trim: true, index: true },
+    statement: { type: String, required: true },
+    hints: { type: [String], default: [] },
+    source: { type: String, enum: ['gemini', 'manual'], default: 'gemini' },
+  },
+  { timestamps: true }
+);
+
+// `models.Question` guard avoids "OverwriteModelError" from Next.js hot reload.
+export const Question: Model<IQuestion> =
+  models.Question || model<IQuestion>('Question', QuestionSchema);
