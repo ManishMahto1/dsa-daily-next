@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 const envSchema = z.object({
   MONGO_URI: z.string().min(1, 'MONGO_URI is required'),
-  REDIS_URL: z.string().min(1, 'REDIS_URL is required'),
+  REDIS_URL: z.string().default('redis://127.0.0.1:6379'),
 
   GEMINI_API_KEY: z.string().min(1, 'GEMINI_API_KEY is required'),
-  GEMINI_MODEL: z.string().default('gemini-2.0-flash'),
+  GEMINI_MODEL: z.string().default('gemini-3.6-flash'),
 
   RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
   SENDER_EMAIL: z.string().min(1, 'SENDER_EMAIL is required'),

@@ -11,6 +11,7 @@ export const redisConnection: Redis =
   global.__redisConnection ??
   new IORedis(env.REDIS_URL, {
     maxRetriesPerRequest: null, // required by BullMQ
+    lazyConnect: true,
   });
 
 global.__redisConnection = redisConnection;
