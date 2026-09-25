@@ -6,11 +6,15 @@ import HistoryView, { HistoryItem } from './HistoryView';
 export const dynamic = 'force-dynamic';
 
 export default async function HistoryPage() {
-  await connectDB();
-
-  const deliveries = await Delivery.find()
-    .sort({ createdAt: -1 })
-    .populate<{ questionId: IQuestion }>('questionId');
+  let deliveries: any[] = [];
+  try {
+    await connectDB();
+    deliveries = await Delivery.find()
+      .sort({ createdAt: -1 })
+      .populate<{ questionId: IQuestion }>('questionId');
+  } catch (err) {
+    console.error('[HistoryPage] DB query failed:', err);
+  }
 
   const items: HistoryItem[] = deliveries.map((d) => {
     const q = d.questionId as unknown as IQuestion;

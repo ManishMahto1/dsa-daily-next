@@ -1,13 +1,6 @@
 import mongoose from 'mongoose';
 import { env } from './env';
 
-/**
- * Next.js hot-reloads modules in dev, which would otherwise open a new
- * Mongo connection on every request. We cache the connection promise on
- * `global` so it survives across module reloads (standard Next.js +
- * Mongoose pattern). The worker process (a plain long-running Node
- * process) benefits from this too — it just connects once.
- */
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -22,13 +15,40 @@ const cache: MongooseCache = global.__mongooseCache ?? { conn: null, promise: nu
 global.__mongooseCache = cache;
 
 export async function connectDB(): Promise<typeof mongoose> {
-  if (cache.conn) return cache.conn;
+  const uri = process.env.MONGO_URI || env.MONGO_URI;
+
+  if (!uri || uri.trim() === '') {
+    throw new Error('MONGO_URI is missing. Please add it to your Vercel Environment Variables.');
+  }
+
+  if (cache.conn && mongoose.connection.readyState === 1) {
+    return cache.conn;
+  }
 
   if (!cache.promise) {
     mongoose.set('strictQuery', true);
-    cache.promise = mongoose.connect(env.MONGO_URI).then((m) => m);
+    cache.promise = mongoose
+      .connect(uri, {
+        serverSelectionTimeoutMS: 5000,
+        bufferCommands: false,
+      })
+      .then((m) => {
+        cache.conn = m;
+        return m;
+      })
+      .catch((err) => {
+        cache.promise = null;
+        cache.conn = null;
+        throw err;
+      });
   }
 
-  cache.conn = await cache.promise;
-  return cache.conn;
+  try {
+    cache.conn = await cache.promise;
+    return cache.conn;
+  } catch (err) {
+    cache.promise = null;
+    cache.conn = null;
+    throw err;
+  }
 }

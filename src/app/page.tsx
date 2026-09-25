@@ -16,22 +16,63 @@ const DIFFICULTY_STYLES = {
 };
 
 export default async function HomePage() {
-  await connectDB();
+  let dbError: string | null = null;
+  let recentDeliveries: any[] = [];
+  let totalCount = 0;
+  let progress = {
+    currentLevel: 'school' as const,
+    streak: 0,
+    missStreak: 0,
+    totalSolved: 0,
+    totalAttempted: 0,
+    accuracy: 0,
+  };
 
-  const [recentDeliveries, totalCount, progress] = await Promise.all([
-    Delivery.find()
-      .sort({ createdAt: -1 })
-      .limit(6)
-      .populate<{ questionId: IQuestion }>('questionId'),
-    Delivery.countDocuments(),
-    getProgressSummary(),
-  ]);
+  try {
+    await connectDB();
+    const [deliveries, count, prog] = await Promise.all([
+      Delivery.find()
+        .sort({ createdAt: -1 })
+        .limit(6)
+        .populate<{ questionId: IQuestion }>('questionId'),
+      Delivery.countDocuments(),
+      getProgressSummary(),
+    ]);
+    recentDeliveries = deliveries;
+    totalCount = count;
+    progress = prog as typeof progress;
+  } catch (err: unknown) {
+    dbError = err instanceof Error ? err.message : 'Database connection error';
+    console.error('[HomePage] DB connection failed:', err);
+  }
 
   const latestDelivery = recentDeliveries[0];
   const latestQuestion = latestDelivery?.questionId;
 
   return (
     <main style={{ maxWidth: 880, margin: '0 auto', padding: '48px 20px' }}>
+      {/* Database Error Banner if not yet connected in Vercel */}
+      {dbError && (
+        <div
+          style={{
+            padding: '16px 20px',
+            borderRadius: 12,
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            color: '#f87171',
+            marginBottom: 28,
+            fontSize: 14,
+            lineHeight: 1.6,
+          }}
+        >
+          <div style={{ fontWeight: 700, marginBottom: 4 }}>⚠️ MongoDB Connection Required</div>
+          <div>{dbError}</div>
+          <div style={{ marginTop: 8, fontSize: 13, color: '#cbd5e1' }}>
+            Please add <code>MONGO_URI</code> to your Vercel Project <strong>Settings ➔ Environment Variables</strong> with your Atlas connection string, and ensure Network Access in Atlas is set to <code>0.0.0.0/0</code>.
+          </div>
+        </div>
+      )}
+
       {/* Top Bar Navigation */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
         <div
